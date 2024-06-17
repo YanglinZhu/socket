@@ -19,16 +19,24 @@ int authenticate_user(const char *username, const char *password);
 void *handle_client(void *arg) {
     int client_socket = *(int *)arg;
     char buffer[BUFFER_SIZE];
+    
     while (1) {
         memset(buffer, 0, BUFFER_SIZE);
         int valread = read(client_socket, buffer, BUFFER_SIZE);
         if (valread <= 0) {
             break;
         }
+        int nameNumber = 0;
+        char userName[8][20];
+        for(int i = 0 ; i < nameNumber ; i++)
+        if (strncmp(buffer, userName[nameNumber], sizeof(userName[nameNumber])) == 0) {
+            send(client_sockets[nameNumber], buffer, strlen(buffer), 0);
+        }
 
         if (strncmp(buffer, "login ", 6) == 0) {
             char username[50], password[50];
             sscanf(buffer + 6, "%s %s", username, password);
+            sscanf(userName[nameNumber++] ,"%s" ,username);
             if (authenticate_user(username, password)) {
                 send(client_socket, "Login successful", strlen("Login successful"), 0);
             } else {
