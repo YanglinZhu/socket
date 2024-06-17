@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <sqlite3.h>
 
-#define PORT 6666
+#define PORT 8666
 #define BUFFER_SIZE 1024
 #define MAX_CLIENTS 100
 
@@ -16,6 +16,7 @@ sqlite3 *db;
 void *handle_client(void *arg);
 int authenticate_user(const char *username, const char *password);
 
+int nameNumber = 0;
 char userName[8][20];
 void *handle_client(void *arg) {
     int client_socket = *(int *)arg;
@@ -27,17 +28,19 @@ void *handle_client(void *arg) {
         if (valread <= 0) {
             break;
         }
-        int nameNumber = 0;
         if (strncmp(buffer, "Personal ", 9) == 0) {
-            for(int i = 0 ; i < nameNumber ; i++)
-              if(strncmp(userName[i] , buffer + 9, strlen(userName[i]))==0)
-                  send(client_sockets[nameNumber], buffer + 9 + strlen(userName[i]) , strlen(buffer) - 9 - strlen(userName[i]) , 0);
-        }
+          char username[50] , text[100];
+          sscanf(buffer + 9 , "%s@@%s" , username , text);
 
-        if (strncmp(buffer, "login ", 6) == 0) {
+            for(int i = 0 ; i < nameNumber ; i++)
+              if(strncmp(userName[i] , username, strlen(username))==0)
+              {          send(client_sockets[nameNumber], text , strlen(text) , 0); 
+              }
+        }
+        else if (strncmp(buffer, "login ", 6) == 0) {
             char username[50], password[50];
             sscanf(buffer + 6, "%s %s", username, password);
-            sscanf(userName[nameNumber++] ,"%s" ,username);
+            sscanf(username ,"%s" ,userName[nameNumber]);
             if (authenticate_user(username, password)) {
                 send(client_socket, "Login successful", strlen("Login successful"), 0);
             } else {

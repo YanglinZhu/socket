@@ -23,10 +23,10 @@ all: $(CLIENT_TARGET) $(SERVER_TARGET)
 
 # Linking rules
 $(CLIENT_TARGET): $(CLIENT_SRC)
-	$(CC) $(CFLAGS) $^ $(LIBS_GTK) $(LIBS_THREAD) -o $@
+	$(CC) $(CFLAGS) $^ $(LIBS_GTK) $(LIBS_THREAD) -o $@ -g
 
 $(SERVER_TARGET): $(SERVER_SRC)
-	$(CC) $(SERVER_SRC) -o $@ -lsqlite3 $(LIBS_THREAD)
+	$(CC) $(SERVER_SRC) -o $@ -lsqlite3 $(LIBS_THREAD) -g
 
 # Clean rule
 clean:

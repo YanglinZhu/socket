@@ -6,13 +6,13 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 6666
+#define PORT 8666
 #define BUFFER_SIZE 1024
 const char* Username;
 int sock = 0;
 GtkWidget *grid; 
 GtkWidget *login_button ,*sendEveryone_button ,*sendPersonal_button , *exit_button;
-GtkWidget *message_entry, *chat_view, *username_entry, *password_entry;
+GtkWidget *message_entry, *chat_view, *username_entry, *password_entry ,* friendName_entry;
 GtkTextBuffer *chat_buffer;
 pthread_t recv_thread;
 
@@ -41,17 +41,15 @@ void on_sendPersonal_button_clicked(GtkWidget *widget, gpointer data) {
 
     char tempMessage[1024];
     if(gtk_widget_get_visible(sendEveryone_button)) 
-      gtk_entry_set_placeholder_text(GTK_ENTRY(message_entry) , "请输入你要私聊的对象");
+      gtk_entry_set_placeholder_text(GTK_ENTRY(friendName_entry) , "请输入你要私聊的对象");
     else {
-
-
-        gtk_entry_set_placeholder_text(GTK_ENTRY(message_entry) , "");
+        gtk_entry_set_placeholder_text(GTK_ENTRY(friendName_entry) , "");
         const char *message = gtk_entry_get_text(GTK_ENTRY(message_entry));
-        
+        const char *name = gtk_entry_get_text(GTK_ENTRY(friendName_entry));
         if (strlen(message) == 0) {
             return;
         }
-        sprintf(tempMessage , "%s %s" , "Personal " ,message);
+        sprintf(tempMessage , "%s%s@@%s: %s" , "Personal " , name , Username ,message );
         send(sock, tempMessage, strlen(tempMessage), 0);
 
         if (strncmp(message,"quit",4) == 0) {
@@ -71,6 +69,7 @@ void on_exit_button_clicked(GtkWidget *widget, gpointer data) {
 
 void on_sendEveryone_button_clicked(GtkWidget *widget, gpointer data) {
     char tempMessage[1024];
+    gtk_widget_hide(friendName_entry);
     const char *message = gtk_entry_get_text(GTK_ENTRY(message_entry));
     if(gtk_widget_get_visible(sendPersonal_button)){
       gtk_widget_hide(sendPersonal_button);
@@ -102,6 +101,7 @@ void *receive_messages(void *arg) {
           gtk_widget_show(message_entry);
           gtk_widget_show(sendEveryone_button);
           gtk_widget_show(sendPersonal_button);
+          gtk_widget_show(friendName_entry);
         }
 
         // 将接收到的消息显示在聊天窗口中
@@ -168,6 +168,10 @@ int main(int argc, char *argv[]) {
     // 创建消息输入框
     message_entry = gtk_entry_new();
     gtk_grid_attach(GTK_GRID(grid), message_entry, 0, 1, 1, 1);
+    
+    friendName_entry = gtk_entry_new();
+    gtk_grid_attach(GTK_GRID(grid), friendName_entry, 0, 2, 1, 1);
+
 
     // 创建发送按钮
     sendEveryone_button = gtk_button_new_with_label("群聊");
@@ -176,7 +180,7 @@ int main(int argc, char *argv[]) {
 
     sendPersonal_button = gtk_button_new_with_label("私聊");
     g_signal_connect(sendPersonal_button, "clicked", G_CALLBACK(on_sendPersonal_button_clicked), NULL);
-    gtk_grid_attach(GTK_GRID(grid), sendPersonal_button, 2, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), sendPersonal_button, 1, 2, 1, 1);
     
    
 
@@ -188,7 +192,7 @@ int main(int argc, char *argv[]) {
     gtk_scrolled_window_set_min_content_width(GTK_SCROLLED_WINDOW(scrolled_window) , 500);
     gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolled_window) , 200);
     gtk_container_add(GTK_CONTAINER(scrolled_window), chat_view);
-    gtk_grid_attach(GTK_GRID(grid), scrolled_window, 0, 2, 3, 3);
+    gtk_grid_attach(GTK_GRID(grid), scrolled_window, 0, 3, 3, 3);
 
     // 创建并启动接收消息的线程
     pthread_create(&recv_thread, NULL, receive_messages, NULL);
@@ -196,6 +200,7 @@ int main(int argc, char *argv[]) {
     gtk_widget_hide(sendEveryone_button);
     gtk_widget_hide(sendPersonal_button);
     gtk_widget_hide(message_entry);
+    gtk_widget_hide(friendName_entry);
     // 运行GTK主循环
     gtk_main();
 
