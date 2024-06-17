@@ -16,6 +16,7 @@ sqlite3 *db;
 void *handle_client(void *arg);
 int authenticate_user(const char *username, const char *password);
 
+char userName[8][20];
 void *handle_client(void *arg) {
     int client_socket = *(int *)arg;
     char buffer[BUFFER_SIZE];
@@ -27,7 +28,6 @@ void *handle_client(void *arg) {
             break;
         }
         int nameNumber = 0;
-        char userName[8][20];
         if (strncmp(buffer, "Personal ", 9) == 0) {
             for(int i = 0 ; i < nameNumber ; i++)
               if(strncmp(userName[i] , buffer + 9, strlen(userName[i]))==0)
