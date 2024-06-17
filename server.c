@@ -29,7 +29,6 @@ void *handle_client(void *arg) {
         int nameNumber = 0;
         char userName[8][20];
         if (strncmp(buffer, "Personal ", 9) == 0) {
-
             for(int i = 0 ; i < nameNumber ; i++)
               if(strncmp(userName[i] , buffer + 9, strlen(userName[i]))==0)
                   send(client_sockets[nameNumber], buffer + 9 + strlen(userName[i]) , strlen(buffer) - 9 - strlen(userName[i]) , 0);

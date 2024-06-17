@@ -51,7 +51,7 @@ void on_sendPersonal_button_clicked(GtkWidget *widget, gpointer data) {
         if (strlen(message) == 0) {
             return;
         }
-        sprintf(tempMessage , "%s: %s" , Username ,message);
+        sprintf(tempMessage , "%s %s" , "Personal " ,message);
         send(sock, tempMessage, strlen(tempMessage), 0);
 
         if (strncmp(message,"quit",4) == 0) {
