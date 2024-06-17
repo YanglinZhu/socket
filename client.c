@@ -131,6 +131,8 @@ int main(int argc, char *argv[]) {
     gtk_text_view_set_editable(GTK_TEXT_VIEW(chat_view), FALSE);
     chat_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(chat_view));
     GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_min_content_width(GTK_SCROLLED_WINDOW(scrolled_window), 500);
+    gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolled_window),200);
     gtk_container_add(GTK_CONTAINER(scrolled_window), chat_view);
     gtk_grid_attach(GTK_GRID(grid), scrolled_window, 0, 2, 3, 3);
 
