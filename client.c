@@ -45,13 +45,8 @@ void on_sendPersonal_button_clicked(GtkWidget *widget, gpointer data) {
     if (strlen(message) == 0) {
         return;
     }
-    sprintf(tempMessage , "%s%s %s :%s" , "Personal " , name , Username ,message );
+    sprintf(tempMessage , "%s%s %s %s" , "Personal " , Username , name ,message );
     send(sock, tempMessage, strlen(tempMessage), 0);
-
-    if (strncmp(message,"quit",4) == 0) {
-      printf("程序运行结束！");
-      exit(EXIT_FAILURE);
-    }
 
     gtk_entry_set_text(GTK_ENTRY(message_entry), "");
 }
@@ -68,7 +63,8 @@ void on_sendEveryone_button_clicked(GtkWidget *widget, gpointer data) {
     sprintf(tempMessage , "%s: %s" , Username ,message);
     send(sock, tempMessage, strlen(tempMessage), 0);
     if (strncmp(message,"quit",4) == 0) {
-      gtk_widget_show(sendPersonal_button);
+      printf("程序运行结束！");
+      exit(EXIT_FAILURE);
     }
     gtk_entry_set_text(GTK_ENTRY(message_entry), "");
 }

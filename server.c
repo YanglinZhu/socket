@@ -4,11 +4,12 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include <sqlite3.h>
 
 #define PORT 8666
 #define BUFFER_SIZE 1024
-#define MAX_CLIENTS 100
+#define MAX_CLIENTS 15
 
 int client_sockets[MAX_CLIENTS];
 sqlite3 *db;
@@ -30,13 +31,22 @@ void *handle_client(void *arg) {
         }
         if (strncmp(buffer, "Personal ", 9) == 0) {
           char username[50] , text[100] , friendname[50];
-          char Test[100];
-          sscanf(buffer + 9 , "%s %s %s" , friendname , username , text);
-
-            for(int i = 0 ; i < nameNumber ; i++)
-              if(strncmp(userName[i] , friendname, strlen(username))==0)
-                        send(client_sockets[i], buffer + 9 + strlen(friendname) , strlen(buffer) - 9 - strlen(friendname), 0); 
-             send(client_socket, buffer + 9 + strlen(friendname) , strlen(buffer) - 9 - strlen(friendname), 0); 
+          bool isname = false;
+          sscanf(buffer + 9 , "%s %s %s" , username , friendname , text);
+          for(int i = 0 ; i < nameNumber ; i++)
+            if(strncmp(userName[i] , friendname, strlen(username))==0) {
+                isname = true;
+                memset(buffer, 0, BUFFER_SIZE);
+                sprintf(buffer , "Personal %s@%s: %s" , username , friendname , text);
+                send(client_sockets[i], buffer + 9 , strlen(buffer) - 9 , 0); 
+            }
+          if(isname)
+          send(client_socket, buffer + 9, strlen(buffer) - 9, 0); 
+          else {
+            char point[100];
+            sprintf(point , "Usage:%s does not exist" , friendname);
+            send(client_socket , point , strlen(point) , 0);
+          }
         }
         else if (strncmp(buffer, "login ", 6) == 0) {
             char username[50], password[50];
