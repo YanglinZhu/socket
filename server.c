@@ -101,8 +101,10 @@ int authenticate_user(const char *username, const char *password) {
     }
 }
 void clear(int signo) {
+  if(signo == SIGINT || signo == SIGQUIT || signo == SIGTERM){
     sqlite3_close(db);
     close(server_fd);
+  }
 }
 int set_signal_handler() {
   struct sigaction act , oldact;
