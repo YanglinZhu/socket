@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <stdbool.h>
@@ -17,6 +18,7 @@ sqlite3 *db;
 void *handle_client(void *arg);
 int authenticate_user(const char *username, const char *password);
 
+int server_fd, new_socket;
 int nameNumber = 0;
 char userName[8][20];
 void *handle_client(void *arg) {
@@ -98,9 +100,27 @@ int authenticate_user(const char *username, const char *password) {
         return 0;
     }
 }
+void clear(int signo) {
+    sqlite3_close(db);
+    close(server_fd);
+}
+int set_signal_handler() {
+  struct sigaction act , oldact;
+  act.sa_handler = clear;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = 0;
+  if(sigaction(SIGINT , &act , &oldact)== -1) {
+    perror("Can not catch SIGINT");
+    return -1;
+  }
+  if(sigaction(SIGTERM , &act , &oldact)==-1) {
+    perror("can not catch SIGTERM");
+    return -1;
+  }
+  return 0;
+}
 
 int main(int argc, char *argv[]) {
-    int server_fd, new_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
 
@@ -165,9 +185,6 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
-    sqlite3_close(db);
-    close(server_fd);
 
     return 0;
 }

@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     serv_addr.sin_port = htons(PORT);
 
     // 将服务器IP地址转换为二进制形式并填充到结构体中
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, "192.168.103.5", &serv_addr.sin_addr) <= 0) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
