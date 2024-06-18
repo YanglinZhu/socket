@@ -104,6 +104,8 @@ void clear(int signo) {
   if(signo == SIGINT || signo == SIGQUIT || signo == SIGTERM){
     sqlite3_close(db);
     close(server_fd);
+    for(int i = 0 ; i < nameNumber ; i++) 
+      close(client_sockets[i]);
   }
 }
 int set_signal_handler() {
