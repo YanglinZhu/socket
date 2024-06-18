@@ -29,20 +29,21 @@ void *handle_client(void *arg) {
             break;
         }
         if (strncmp(buffer, "Personal ", 9) == 0) {
-          char username[50] , text[100];
-          sscanf(buffer + 9 , "%s@@%s" , username , text);
+          char username[50] , text[100] , friendname[50];
+          char Test[100];
+          sscanf(buffer + 9 , "%s %s %s" , friendname , username , text);
 
             for(int i = 0 ; i < nameNumber ; i++)
-              if(strncmp(userName[i] , username, strlen(username))==0)
-              {          send(client_sockets[nameNumber], text , strlen(text) , 0); 
-              }
+              if(strncmp(userName[i] , friendname, strlen(username))==0)
+                        send(client_sockets[i], buffer + 9 + strlen(friendname) , strlen(buffer) - 9 - strlen(friendname), 0); 
+             send(client_socket, buffer + 9 + strlen(friendname) , strlen(buffer) - 9 - strlen(friendname), 0); 
         }
         else if (strncmp(buffer, "login ", 6) == 0) {
             char username[50], password[50];
             sscanf(buffer + 6, "%s %s", username, password);
-            sscanf(username ,"%s" ,userName[nameNumber]);
             if (authenticate_user(username, password)) {
                 send(client_socket, "Login successful", strlen("Login successful"), 0);
+                sscanf(username ,"%s" ,userName[nameNumber++]);
             } else {
                 send(client_socket, "Login failed", strlen("Login failed"), 0);
             }

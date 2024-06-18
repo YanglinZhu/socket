@@ -40,28 +40,20 @@ void on_login_button_clicked(GtkWidget *widget, gpointer data) {
 void on_sendPersonal_button_clicked(GtkWidget *widget, gpointer data) {
 
     char tempMessage[1024];
-    if(gtk_widget_get_visible(sendEveryone_button)) 
-      gtk_entry_set_placeholder_text(GTK_ENTRY(friendName_entry) , "请输入你要私聊的对象");
-    else {
-        gtk_entry_set_placeholder_text(GTK_ENTRY(friendName_entry) , "");
-        const char *message = gtk_entry_get_text(GTK_ENTRY(message_entry));
-        const char *name = gtk_entry_get_text(GTK_ENTRY(friendName_entry));
-        if (strlen(message) == 0) {
-            return;
-        }
-        sprintf(tempMessage , "%s%s@@%s: %s" , "Personal " , name , Username ,message );
-        send(sock, tempMessage, strlen(tempMessage), 0);
-
-        if (strncmp(message,"quit",4) == 0) {
-          printf("程序运行结束！");
-          exit(EXIT_FAILURE);
-        }
-
-        gtk_entry_set_text(GTK_ENTRY(message_entry), "");
-
+    const char *message = gtk_entry_get_text(GTK_ENTRY(message_entry));
+    const char *name = gtk_entry_get_text(GTK_ENTRY(friendName_entry));
+    if (strlen(message) == 0) {
+        return;
     }
-    gtk_widget_hide(sendEveryone_button);
+    sprintf(tempMessage , "%s%s %s :%s" , "Personal " , name , Username ,message );
+    send(sock, tempMessage, strlen(tempMessage), 0);
 
+    if (strncmp(message,"quit",4) == 0) {
+      printf("程序运行结束！");
+      exit(EXIT_FAILURE);
+    }
+
+    gtk_entry_set_text(GTK_ENTRY(message_entry), "");
 }
 void on_exit_button_clicked(GtkWidget *widget, gpointer data) {
   exit(EXIT_SUCCESS);
@@ -69,17 +61,12 @@ void on_exit_button_clicked(GtkWidget *widget, gpointer data) {
 
 void on_sendEveryone_button_clicked(GtkWidget *widget, gpointer data) {
     char tempMessage[1024];
-    gtk_widget_hide(friendName_entry);
     const char *message = gtk_entry_get_text(GTK_ENTRY(message_entry));
-    if(gtk_widget_get_visible(sendPersonal_button)){
-      gtk_widget_hide(sendPersonal_button);
-    }
     if (strlen(message) == 0) {
         return;
     }
     sprintf(tempMessage , "%s: %s" , Username ,message);
     send(sock, tempMessage, strlen(tempMessage), 0);
-
     if (strncmp(message,"quit",4) == 0) {
       gtk_widget_show(sendPersonal_button);
     }
@@ -171,7 +158,7 @@ int main(int argc, char *argv[]) {
     
     friendName_entry = gtk_entry_new();
     gtk_grid_attach(GTK_GRID(grid), friendName_entry, 0, 2, 1, 1);
-
+    gtk_entry_set_placeholder_text(GTK_ENTRY(friendName_entry) , "请输入你要私聊的对象");
 
     // 创建发送按钮
     sendEveryone_button = gtk_button_new_with_label("群聊");
