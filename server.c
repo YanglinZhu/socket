@@ -61,7 +61,7 @@ void *handle_client(void *arg) {
                     if(client_sockets[i] != client_socket){
                       char tmpbuf[100];
                       sprintf(tmpbuf , "%s %s" , username , "上线啦～～～");
-                      send(client_sockets[i], buffer, strlen(buffer), 0);
+                      send(client_sockets[i], tmpbuf, strlen(tmpbuf), 0);
                     }
                   }
             }
