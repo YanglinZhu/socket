@@ -56,6 +56,15 @@ void *handle_client(void *arg) {
             if (authenticate_user(username, password)) {
                 send(client_socket, "Login successful", strlen("Login successful"), 0);
                 sscanf(username ,"%s" ,userName[nameNumber++]);
+                for (int i = 0; i < MAX_CLIENTS; i++) {
+                  if (client_sockets[i] != 0) {
+                    if(client_sockets[i] != client_socket){
+                      char tmpbuf[100];
+                      sprintf(tmpbuf , "%s %s" , username , "上线啦～～～");
+                      send(client_sockets[i], buffer, strlen(buffer), 0);
+                    }
+                  }
+            }
             } else {
                 send(client_socket, "Login failed", strlen("Login failed"), 0);
             }
