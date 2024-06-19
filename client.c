@@ -50,9 +50,6 @@ void on_sendPersonal_button_clicked(GtkWidget *widget, gpointer data) {
 
     gtk_entry_set_text(GTK_ENTRY(message_entry), "");
 }
-void on_exit_button_clicked(GtkWidget *widget, gpointer data) {
-  exit(EXIT_SUCCESS);
-}
 
 void on_sendEveryone_button_clicked(GtkWidget *widget, gpointer data) {
     char tempMessage[1024];
@@ -95,9 +92,32 @@ void *receive_messages(void *arg) {
     }
     return NULL;
 }
-
+void clear(int signo) {
+  // 关闭socket
+    close(sock);
+    exit(EXIT_FAILURE);
+}
+int set_signal_handler() {
+  struct sigaction act , oldact;
+  act.sa_handler = clear;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = 0;
+  if(sigaction(SIGINT , &act , &oldact)== -1) {
+    perror("Can not catch SIGINT");
+    return -1;
+  }
+  if(sigaction(SIGTERM , &act , &oldact)==-1) {
+    perror("can not catch SIGTERM");
+    return -1;
+  }
+  return 0;
+}
 int main(int argc, char *argv[]) {
     struct sockaddr_in serv_addr;
+    int ret = set_signal_handler();
+    if(ret != 0) {
+      exit(EXIT_FAILURE);
+    }
 
     // 创建socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -189,9 +209,6 @@ int main(int argc, char *argv[]) {
 
     // 等待接收消息线程结束
     pthread_join(recv_thread, NULL);
-
-    // 关闭socket
-    close(sock);
 
     return 0;
 }

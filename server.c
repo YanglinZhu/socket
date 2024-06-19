@@ -107,6 +107,7 @@ void clear(int signo) {
     for(int i = 0 ; i < nameNumber ; i++) 
       close(client_sockets[i]);
   }
+  exit(EXIT_FAILURE);
 }
 int set_signal_handler() {
   struct sigaction act , oldact;
@@ -127,6 +128,10 @@ int set_signal_handler() {
 int main(int argc, char *argv[]) {
     struct sockaddr_in address;
     int addrlen = sizeof(address);
+    int ret = set_signal_handler();
+    if(ret != 0) {
+      exit(EXIT_FAILURE);
+    }
 
     // 初始化客户端socket数组
     for (int i = 0; i < MAX_CLIENTS; i++) {
